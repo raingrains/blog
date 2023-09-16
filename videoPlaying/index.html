@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放</title>
+    <!-- 引入vue.js -->
+    <script src="./assets/vue.min.js"></script>
+    <!-- 引入element-ui -->
+    <script src="./assets/elementui.js"></script>
+    <link rel="stylesheet" href="./assets/elementui.css">
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div id="app">
+
+
+        <div :style="{width: `calc(100% - ${listDomWidth}px)`}" class="video-container" ref="videoContainer"></div>
+
+        <div class="file-list" :style="{width: listDomWidth+'px'}">
+            <div class="line" @drag="changeListDomWidth" draggable></div>
+            <div class="container">
+                <div class="btns-box">
+                    <input type="file" ref="dirSelectedInput" webkitdirectory class="category-input"
+                        @change="getDirTreeData">
+
+
+                    <el-button class="category-btn" size="small" @click="openDirDialog">选择文件夹</el-button>
+
+                </div>
+                <div class="list">
+                    <el-tree :data="fileList" :props="{
+                        label:'name',
+                        children:'children'
+                    }" @node-click="handleNodeClick"></el-tree>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+
+<script src="./index.js"></script>
+
+
+</html>

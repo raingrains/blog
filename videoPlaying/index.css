@@ -1,0 +1,66 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+ul,
+ol,
+dl {
+  list-style: none;
+}
+
+.category-input {
+  position: absolute;
+  z-index: -999;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  padding: 10px;
+  min-width: 1200px;
+  max-width: 2560px;
+  justify-content: space-between;
+}
+
+.file-list {
+  display: flex;
+  overflow-x: auto;
+}
+
+.file-list .line {
+  width: 0px;
+  border-left: 4px solid #f2f2f2;
+  cursor: col-resize;
+}
+.file-list .container {
+  width: calc(100% - 4px);
+}
+
+.btns-box {
+  border-bottom: 1px solid #f2f2f2;
+  padding: 8px;
+}
+.list {
+  height: calc(100vh - 70px);
+  overflow: auto;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+}
+
+.el-tree {
+  width: 100%;
+}
+
+.el-tree > .el-tree-node {
+  display: inline-block;
+  min-width: 100%;
+}
