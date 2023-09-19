@@ -11,31 +11,50 @@
     <script src="./assets/elementui.js"></script>
     <link rel="stylesheet" href="./assets/elementui.css">
     <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./assets/css/index.css">
 </head>
 
 <body>
     <div id="app">
 
+        <div :style="{width: `calc(100% - ${listDomWidth}px)`}" class="video-container" ref="videoContainer">
 
-        <div :style="{width: `calc(100% - ${listDomWidth}px)`}" class="video-container" ref="videoContainer"></div>
+            <video ref="videoContent" v-if="currentFileType==='video'" class="video-content" autoplay controls></video>
+        </div>
 
         <div class="file-list" :style="{width: listDomWidth+'px'}">
             <div class="line" @drag="changeListDomWidth" draggable></div>
             <div class="container">
-                <div class="btns-box">
-                    <input type="file" ref="dirSelectedInput" webkitdirectory class="category-input"
-                        @change="getDirTreeData">
+                <el-tabs class="btns-box" v-model="activeTabName">
+                    <el-tab-pane label="列表" name="list">
+                        <input type="file" ref="dirSelectedInput" webkitdirectory class="category-input"
+                            @change="getDirTreeData">
 
 
-                    <el-button class="category-btn" size="small" @click="openDirDialog">选择文件夹</el-button>
+                        <el-button class="category-btn" size="small" @click="openDirDialog">选择文件夹</el-button>
 
-                </div>
-                <div class="list">
-                    <el-tree :data="fileList" :props="{
-                        label:'name',
-                        children:'children'
-                    }" @node-click="handleNodeClick"></el-tree>
-                </div>
+                        <div class="list">
+                            <el-tree :data="fileList" :props="{
+                                                label:'name',
+                                                children:'children'
+                                            }" @node-click="handleNodeClick"></el-tree>
+                        </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="记录" name="record">
+                        <ul v-if="recordList.length">
+                            <li v-for="item in recordList" :key="item.path" :title="item.path">
+                                {{item.name}}
+                            </li>
+                        </ul>
+
+
+                        <div class="not-data" v-else> 暂无数据 </div>
+
+
+                    </el-tab-pane>
+                </el-tabs>
+
+
             </div>
 
         </div>
@@ -45,6 +64,7 @@
 </body>
 
 
+<script src="./assets/js/utils.js"></script>
 <script src="./index.js"></script>
 
 

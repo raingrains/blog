@@ -1,125 +1,86 @@
-let categoryInput = document.getElementsByClassName('category-input')[0]
-let videoContainer = document.getElementsByClassName('video-container')[0]
+// let categoryInput = document.getElementsByClassName('category-input')[0]
+// let videoContainer = document.getElementsByClassName('video-container')[0]
 
-let categoryBtn = document.getElementsByClassName('category-btn')[0]
+// let categoryBtn = document.getElementsByClassName('category-btn')[0]
 
-categoryInput.onchange = e => {
-  console.log(e)
+// categoryInput.onchange = e => {
+//   console.log(e)
 
-  /**
-   * 目录选择器获取的file一维数组转换成树形结构
-   * @param {*} e input directory 事件event
-   * @returns
-   */
-  function dirData2Tree(e) {
-    const fileList = [...e.target.files].map(item => ({
-      file: item,
-      name: item.name,
-      path: item.webkitRelativePath,
-      fullPath: item.webkitRelativePath.split('/'),
-    }))
+//   /**
+//    * 目录选择器获取的file一维数组转换成树形结构
+//    * @param {*} e input directory 事件event
+//    * @returns
+//    */
+//   function dirData2Tree(e) {
+//     const fileList = [...e.target.files].map(item => ({
+//       file: item,
+//       name: item.name,
+//       path: item.webkitRelativePath,
+//       fullPath: item.webkitRelativePath.split('/'),
+//     }))
 
-    let num = fileList.map(item => item.fullPath.length).sort()[
-      fileList.length - 1
-    ]
+//     let num = fileList.map(item => item.fullPath.length).sort()[
+//       fileList.length - 1
+//     ]
 
-    function filterFloorData(fileList, deep) {
-      let arr = []
-      const fullPathList = fileList.map(item => item.fullPath)
+//     function filterFloorData(fileList, deep) {
+//       let arr = []
+//       const fullPathList = fileList.map(item => item.fullPath)
 
-      for (let index = 0; index < fileList.length; index++) {
-        if (
-          fullPathList[index][deep] &&
-          !arr.find(item => item.name === fullPathList[index][deep])
-        ) {
-          arr.push(
-            fileList[index].fullPath.length === deep + 1
-              ? {
-                  name: fullPathList[index][deep],
-                  file: fileList.find(
-                    _item => _item.name === fullPathList[index][deep]
-                  )?.file,
-                }
-              : {
-                  name: fullPathList[index][deep],
-                  children: [],
-                }
-          )
-        }
-      }
-      return arr
-    }
+//       for (let index = 0; index < fileList.length; index++) {
+//         if (
+//           fullPathList[index][deep] &&
+//           !arr.find(item => item.name === fullPathList[index][deep])
+//         ) {
+//           arr.push(
+//             fileList[index].fullPath.length === deep + 1
+//               ? {
+//                   name: fullPathList[index][deep],
+//                   file: fileList.find(
+//                     _item => _item.name === fullPathList[index][deep]
+//                   )?.file,
+//                 }
+//               : {
+//                   name: fullPathList[index][deep],
+//                   children: [],
+//                 }
+//           )
+//         }
+//       }
+//       return arr
+//     }
 
-    let categoryList = filterFloorData(fileList, 0)
-    let item = {
-      children: categoryList,
-    }
+//     let categoryList = filterFloorData(fileList, 0)
+//     let item = {
+//       children: categoryList,
+//     }
 
-    let str = ''
+//     let str = ''
 
-    for (let index = 0; index < num - 1; index++) {
-      str += `
-    item.children.forEach(item => {
-    if (item.children) {
-      item.children = filterFloorData(
-        fileList.filter(_item => _item.fullPath[${index}] === item.name),
-        ${index + 1}
-      )
-          `
-    }
+//     for (let index = 0; index < num - 1; index++) {
+//       str += `
+//     item.children.forEach(item => {
+//     if (item.children) {
+//       item.children = filterFloorData(
+//         fileList.filter(_item => _item.fullPath[${index}] === item.name),
+//         ${index + 1}
+//       )
+//           `
+//     }
 
-    str += '}})'.repeat(num - 1)
+//     str += '}})'.repeat(num - 1)
 
-    //   console.log(str)
-    eval(str)
+//     //   console.log(str)
+//     eval(str)
 
-    return categoryList
-  }
+//     return categoryList
+//   }
 
-  console.time('a')
-  console.log(dirData2Tree(e))
-  console.timeEnd('a')
-}
-
-/**
- * 获取下一层目录列表
- * @param {*} dirhandles
- * @returns
- */
-async function getNextDeepDir(dirhandles) {
-  let aaa = dirhandles.values()
-  let array = []
-  for await (const value of aaa) {
-    array.push({
-      fileHandle: value,
-      name: value.name,
-      kind: value.kind,
-      children: [{ name: 1 }],
-    })
-    if (value.kind !== 'directory') {
-      delete array[array.length - 1].children
-    }
-  }
-
-  return array
-}
-
-categoryBtn.onclick = () => {}
-
-// 节流函数
-function throotle(fn, delay) {
-  let timer = null
-
-  return function (...args) {
-    if (timer) {
-      return
-    }
-    fn.apply(this, args)
-    timer = setTimeout(() => {
-      timer = null
-    }, delay)
-  }
-}
+//   console.time('a')
+//   console.log(dirData2Tree(e))
+//   console.timeEnd('a')
+// }
+// categoryBtn.onclick = () => {}
 
 const app = new Vue({
   el: '#app',
@@ -129,27 +90,32 @@ const app = new Vue({
       fileList: [],
       type: 'fileSystem',
       listDomWidth: document.body.clientWidth / 4,
+      currentFileType: '',
+      activeTabName: 'list',
+      recordList: [],
     }
   },
   methods: {
+    // 调整操作栏宽度
     changeListDomWidth: throotle(function (e) {
       if (e.pageX === 0) return
       this.listDomWidth = document.body.clientWidth - 20 - e.pageX
-    }, 20),
-    // changeListDomWidth(e) {
-    //   if (e.pageX === 0) return
-    //   this.listDomWidth = document.body.clientWidth - 28 - e.pageX
-    // },
+    }, 16),
 
+    /**
+     * 打开目录选择器弹窗
+     */
     openDirDialog() {
       try {
+        throw new Error()
         window.showDirectoryPicker().then(async dirhandles => {
           let fileList = [
             {
               name: dirhandles.name,
               kind: dirhandles.kind,
               fileHandle: dirhandles,
-              children: await getNextDeepDir(dirhandles),
+              path: dirhandles.name,
+              children: await getNextDeepDir(dirhandles, dirhandles.name),
             },
           ]
           this.fileList = fileList
@@ -182,7 +148,7 @@ const app = new Vue({
           fileList.length - 1
         ]
 
-        function filterFloorData(fileList, deep) {
+        function filterFloorData(fileList, deep, fathPath) {
           let arr = []
           const fullPathList = fileList.map(item => item.fullPath).sort()
 
@@ -198,9 +164,15 @@ const app = new Vue({
                       file: fileList.find(
                         _item => _item.name === fullPathList[index][deep]
                       )?.file,
+                      path:
+                        (fathPath ? fathPath + '/' : fathPath) +
+                        fullPathList[index][deep],
                     }
                   : {
                       name: fullPathList[index][deep],
+                      path:
+                        (fathPath ? fathPath + '/' : fathPath) +
+                        fullPathList[index][deep],
                       children: [],
                     }
               )
@@ -209,7 +181,7 @@ const app = new Vue({
           return arr
         }
 
-        let categoryList = filterFloorData(fileList, 0)
+        let categoryList = filterFloorData(fileList, 0, '')
 
         let item = {
           children: categoryList,
@@ -223,7 +195,8 @@ const app = new Vue({
     if (item.children) {
       item.children = filterFloorData(
         fileList.filter(_item => _item.fullPath[${index}] === item.name),
-        ${index + 1}
+        ${index + 1},
+        item.path
       )
           `
         }
@@ -239,63 +212,88 @@ const app = new Vue({
       //   console.log(dirData2Tree(e))
 
       this.fileList = dirData2Tree(e)
+
+      console.log(this.fileList)
       this.type = 'fileJson'
     },
 
-    async handleNodeClick(e) {
-      console.log(e)
+    /**
+     * 获取播放记录
+     */
+    getRecordList() {
+      this.recordList = JSON.parse(localStorage.getItem('loadedVideos') || '[]')
+      console.log(this.recordList)
+    },
 
-      if (e.file || e.kind === 'file') {
-        const file = e.file || (await e.fileHandle.getFile())
-        console.log(file)
-        this.$refs.videoContainer.innerHTML = ''
+    async handleNodeClick(data) {
+      if (data.file || data.kind === 'file') {
+        const file = data.file || (await data.fileHandle.getFile())
 
         if (file.type === 'video/mp4') {
+          this.currentFileType = 'video'
           let arr = JSON.parse(localStorage.getItem('loadedVideos'))
           let time =
             arr?.find(item => item.name === file.name)?.loadedTime - 5 || 0
-          const video = document.createElement('video')
-          video.src = URL.createObjectURL(file)
-          video.autoplay = true
-          video.controls = true
-          video.currentTime = time
-          video.dataset.fileName = file.name
-          this.$refs.videoContainer.appendChild(video)
 
-          video.onpause = e => {
-            console.log('暂停', e.target.dataset.fileName, e.target.currentTime)
+          this.$nextTick(() => {
+            let video = this.$refs.videoContent
+            video.src = URL.createObjectURL(file)
+            video.currentTime = time
+            video.dataset.fileName = file.name
+            video.title = file.name
+            // 播放
+            video.play()
 
-            let arr = JSON.parse(localStorage.getItem('loadedVideos'))
-            if (!arr) {
-              arr = [
-                {
-                  name: e.target.dataset.fileName,
-                  loadedTime: e.target.currentTime,
-                },
-              ]
-            } else {
-              let currentVideo = arr.find(
-                item => item.name === e.target.dataset.fileName
+            // 暂停事件
+            video.onpause = e => {
+              console.log(
+                '暂停',
+                e.target.dataset.fileName,
+                e.target.currentTime
               )
-              if (currentVideo) {
-                currentVideo.loadedTime = e.target.currentTime
-              } else {
-                arr.push({
-                  name: e.target.dataset.fileName,
-                  loadedTime: e.target.currentTime,
-                })
-              }
-            }
+              console.dir(e.target)
 
-            localStorage.setItem('loadedVideos', JSON.stringify(arr))
-          }
+              let arr = JSON.parse(localStorage.getItem('loadedVideos'))
+              if (!arr) {
+                arr = [
+                  {
+                    name: e.target.dataset.fileName,
+                    path: data.path,
+                    loadedTime: Math.floor(e.target.currentTime),
+                    totalTime: Math.floor(e.target.duration),
+                    percent:
+                      +(e.target.currentTime / e.target.duration).toFixed(3) *
+                      100,
+                  },
+                ]
+              } else {
+                let currentVideo = arr.find(
+                  item => item.name === e.target.dataset.fileName
+                )
+                if (currentVideo) {
+                  currentVideo.loadedTime = e.target.currentTime
+                } else {
+                  arr.push({
+                    name: e.target.dataset.fileName,
+                    loadedTime: e.target.currentTime,
+                  })
+                }
+              }
+
+              localStorage.setItem('loadedVideos', JSON.stringify(arr))
+            }
+          })
+        } else {
+          this.currentFileType = ''
         }
       }
 
-      if (e.kind === 'directory' && e.children.length === 1) {
-        e.children = await getNextDeepDir(e.fileHandle)
+      if (data.kind === 'directory' && data.children.length === 1) {
+        data.children = await getNextDeepDir(data.fileHandle, data.path)
       }
     },
   },
-  mounted() {},
+  mounted() {
+    this.getRecordList()
+  },
 })

@@ -49,6 +49,7 @@ dl {
 .list {
   height: calc(100vh - 70px);
   overflow: auto;
+  margin-top: 10px;
 }
 
 video {
