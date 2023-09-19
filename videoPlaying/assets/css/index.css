@@ -2,6 +2,30 @@
   color: #909399;
   text-align: center;
   padding: 10px 0;
+  font-size: 12px;
+}
+
+.record-list {
+  list-style: none;
+}
+.record-list li {
+  padding: 4px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  &:hover {
+    color: skyblue;
+  }
+  & > span:nth-child(1) {
+    display: inline-block;
+    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 /*# sourceMappingURL=index.css.map */

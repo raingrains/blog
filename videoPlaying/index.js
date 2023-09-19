@@ -91,9 +91,18 @@ const app = new Vue({
       type: 'fileSystem',
       listDomWidth: document.body.clientWidth / 4,
       currentFileType: '',
+      currentFile: null,
       activeTabName: 'list',
       recordList: [],
     }
+  },
+
+  watch: {
+    activeTabName(val) {
+      if (val === 'record') {
+        this.getRecordList()
+      }
+    },
   },
   methods: {
     // 调整操作栏宽度
@@ -228,7 +237,7 @@ const app = new Vue({
     async handleNodeClick(data) {
       if (data.file || data.kind === 'file') {
         const file = data.file || (await data.fileHandle.getFile())
-
+        data.file = file
         if (file.type === 'video/mp4') {
           this.currentFileType = 'video'
           let arr = JSON.parse(localStorage.getItem('loadedVideos'))
@@ -237,6 +246,14 @@ const app = new Vue({
 
           this.$nextTick(() => {
             let video = this.$refs.videoContent
+
+            if (this.currentFile) {
+              // 记录旧视频源相关信息
+              this.recordMessage(video, this.currentFile)
+            }
+
+            // 设置新视频源
+            this.currentFile = data
             video.src = URL.createObjectURL(file)
             video.currentTime = time
             video.dataset.fileName = file.name
@@ -253,34 +270,7 @@ const app = new Vue({
               )
               console.dir(e.target)
 
-              let arr = JSON.parse(localStorage.getItem('loadedVideos'))
-              if (!arr) {
-                arr = [
-                  {
-                    name: e.target.dataset.fileName,
-                    path: data.path,
-                    loadedTime: Math.floor(e.target.currentTime),
-                    totalTime: Math.floor(e.target.duration),
-                    percent:
-                      +(e.target.currentTime / e.target.duration).toFixed(3) *
-                      100,
-                  },
-                ]
-              } else {
-                let currentVideo = arr.find(
-                  item => item.name === e.target.dataset.fileName
-                )
-                if (currentVideo) {
-                  currentVideo.loadedTime = e.target.currentTime
-                } else {
-                  arr.push({
-                    name: e.target.dataset.fileName,
-                    loadedTime: e.target.currentTime,
-                  })
-                }
-              }
-
-              localStorage.setItem('loadedVideos', JSON.stringify(arr))
+              this.recordMessage(e.target, data)
             }
           })
         } else {
@@ -291,6 +281,59 @@ const app = new Vue({
       if (data.kind === 'directory' && data.children.length === 1) {
         data.children = await getNextDeepDir(data.fileHandle, data.path)
       }
+    },
+    recordMessage(video, data) {
+      let arr = JSON.parse(localStorage.getItem('loadedVideos'))
+      // 没有记录
+      if (!arr) {
+        arr = [
+          {
+            name: video.dataset.fileName,
+            loadedTime: Math.floor(video.currentTime),
+            path: data.path,
+            totalTime: Math.floor(video.duration),
+            percent: +((video.currentTime / video.duration) * 100).toFixed(1),
+          },
+        ]
+      } else {
+        // 有记录且有当前视频记录
+        let currentVideo = arr.find(
+          item => item.name === video.dataset.fileName
+        )
+        if (currentVideo) {
+          currentVideo.loadedTime = video.currentTime
+        } else {
+          // 无当前视频记录
+          arr.push({
+            name: video.dataset.fileName,
+            loadedTime: video.currentTime,
+            path: data.path,
+            totalTime: Math.floor(video.duration),
+            percent: +((video.currentTime / video.duration) * 100).toFixed(1),
+          })
+        }
+      }
+
+      localStorage.setItem('loadedVideos', JSON.stringify(arr))
+    },
+
+    // 秒转 时分秒格式
+    secToTime(time) {
+      let sec_num = parseInt(time, 10) // don't forget the second param
+      let hours = Math.floor(sec_num / 3600)
+      let minutes = Math.floor((sec_num - hours * 3600) / 60)
+      let seconds = sec_num - hours * 3600 - minutes * 60
+      return `${hours < 10 ? '0' + hours : hours}:${
+        minutes < 10 ? '0' + minutes : minutes
+      }:${seconds < 10 ? '0' + seconds : seconds}`
+    },
+
+    /**
+     * 获取记录信息
+     * @param {*} data
+     */
+    getRecord(data) {
+      console.log(data)
     },
   },
   mounted() {

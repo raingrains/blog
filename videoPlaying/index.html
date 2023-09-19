@@ -41,9 +41,11 @@
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="记录" name="record">
-                        <ul v-if="recordList.length">
-                            <li v-for="item in recordList" :key="item.path" :title="item.path">
-                                {{item.name}}
+                        <ul class="record-list" v-if="recordList.length">
+                            <li v-for="item in recordList" :key="item.path" :title="item.path" @click="getRecord(item)">
+                                <span>{{item.name}}</span>
+                                <span>{{item.percent}}%</span>
+                                <span>{{secToTime(item.totalTime)}}</span>
                             </li>
                         </ul>
 
