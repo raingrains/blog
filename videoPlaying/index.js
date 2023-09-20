@@ -259,6 +259,7 @@ const app = new Vue({
             video.title = file.name
             // 播放
             video.play()
+            video.focus()
 
             // 暂停事件
             video.onpause = e => {
