@@ -45,6 +45,7 @@ dl {
 .btns-box {
   border-bottom: 1px solid #f2f2f2;
   padding: 8px;
+  height: calc(100vh - 20px);
 }
 .list {
   height: calc(100vh - 70px);
