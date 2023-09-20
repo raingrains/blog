@@ -116,7 +116,6 @@ const app = new Vue({
      */
     openDirDialog() {
       try {
-        throw new Error()
         window.showDirectoryPicker().then(async dirhandles => {
           let fileList = [
             {
