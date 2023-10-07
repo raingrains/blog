@@ -338,5 +338,15 @@ const app = new Vue({
   },
   mounted() {
     this.getRecordList()
+
+    // 切换回页面时
+    window.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        if (this.$refs.videoContent) {
+          // video标签聚焦
+          this.$refs.videoContent.focus()
+        }
+      }
+    })
   },
 })

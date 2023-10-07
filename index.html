@@ -1,12 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
 </head>
+
 <body>
   <h1>hello world</h1>
+
+
+  <script src="./md5.js"></script>
+  <script>
+
+    /**
+     * 由于不同的系统显卡绘制 canvas 时渲染参数、抗锯齿等算法不同，因此绘制成图片数据的 CRC 校验也不一样。
+     * 因此根据 canvas 可以获取浏览器指纹信息。 
+     * 所以对dataURL的md5加密可以当作设备唯一设备码
+     */
+    function getDeviceUniqueNumber() {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      ctx.font = '14px Arial'
+      ctx.fillStyle = '#ccc'
+      ctx.fillText('hello, world', 2, 2)
+      return SparkMD5.hash(canvas.toDataURL('image/jpeg'))
+    }
+
+
+
+    console.log(getDeviceUniqueNumber());
+  </script>
 </body>
+
 </html>
